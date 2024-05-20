@@ -6,8 +6,8 @@ services:
     container_name: mysql-zabbix
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #    volumes:
-  #      - ./data:/var/lib/mysql:rw
+      volumes:
+        - ./data:/var/lib/mysql:rw
     ports:
       - "${MYSQL_DB_PORT}:3306"
   zabbix-front:
@@ -38,7 +38,7 @@ services:
       DB_SERVER_HOST: mysql-zabbix
       MYSQL_USER: root
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
       ZBX_LISTENPORT: ${ZBX_LISTENPORT}
     ports:
       - "${ZBX_LISTENPORT}:10051"
