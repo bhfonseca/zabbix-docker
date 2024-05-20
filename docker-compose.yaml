@@ -1,0 +1,48 @@
+services:
+  mysql-zabbix:
+    user: '0'
+    image: mysql:8.0
+    restart: unless-stopped
+    container_name: mysql-zabbix
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #    volumes:
+  #      - ./data:/var/lib/mysql:rw
+    ports:
+      - "${MYSQL_DB_PORT}:3306"
+  zabbix-front:
+    user: '0'
+    image: zabbix/zabbix-web-nginx-mysql:alpine-trunk
+    restart: unless-stopped
+    container_name: zabbix-front
+    environment:
+      ZBX_SERVER_NAME: ${ZBX_SERVER_NAME}
+      ZBX_SERVER_HOST: server
+      ZBX_SERVER_PORT: ${ZBX_LISTENPORT}
+      DB_SERVER_HOST: mysql-zabbix
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PHP_TZ: ${PHP_TZ}
+    ports:
+      - "80:8080"
+      - "443:8443"
+    depends_on:
+      - mysql-zabbix
+
+  zabbix-server:
+    user: '0'
+    image: zabbix/zabbix-server-mysql:alpine-trunk
+    restart: unless-stopped
+    container_name: zabbix-server
+    environment:
+      DB_SERVER_HOST: mysql-zabbix
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      ZBX_LISTENPORT: ${ZBX_LISTENPORT}
+    ports:
+      - "${ZBX_LISTENPORT}:10051"
+    depends_on:
+      - mysql-zabbix
+#networks:
+#  zabbix:
